@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <stack>
 #include <deque>
 
 struct sOperator
@@ -38,6 +39,39 @@ struct Token
     sOperator op;
 };
 
+double solveRPN(std::deque<Token> stack)
+{
+    std::stack<double> resultStack;
+    for(auto& item: stack)
+    {
+        // TODO: Find out how to check if a string is a number
+        if(item.type == Token::Type::Number)
+        {
+            resultStack.push(std::stod(item.value));
+        }
+        else if (item.type == Token::Type::Operator)
+        {
+            double result {};
+            double y = resultStack.top();
+            resultStack.pop();
+            double x = resultStack.top();
+            resultStack.pop();
+            if(item.value == "+")
+                result = x + y;
+            else if(item.value == "-")
+                result = x - y;
+            else if(item.value == "*")
+                result = x * y;    
+            else if(item.value == "/")
+                result = x / y;
+
+            resultStack.push(result);
+        }
+    }
+
+    return resultStack.top();
+}
+
 int main()
 {
     std::string expression {};
@@ -53,6 +87,10 @@ int main()
         {
             // Push literal numerics right into the output stack
             outputStack.push_back({std::string(1, c), Token::Type::Number});
+        }
+        else if (c == ' ')
+        {
+            continue;
         }
         else if(c == '(')
         {
@@ -125,5 +163,6 @@ int main()
     }
     std::cout << "\n";
 
+    std::cout << "Solution is : " << solveRPN(outputStack) << std::endl;
     return 0;
 }
