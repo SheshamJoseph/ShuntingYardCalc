@@ -81,12 +81,19 @@ int main()
     std::deque<Token> holdingStack;
     std::deque<Token> outputStack;
     
-    for(const char c: expression)
+    for(size_t i=0; i<expression.length(); i++)
     {
-        if(std::isdigit(c))
+        char c = expression[i];
+        if(std::isdigit(c) || c =='.')
         {
             // Push literal numerics right into the output stack
-            outputStack.push_back({std::string(1, c), Token::Type::Number});
+            std::string number;
+            while(i < expression.length() && (std::isdigit(expression[i]) || expression[i] == '.'))
+            {
+                number += expression[i++];
+            }
+            --i;    // compensate for increment in loop
+            outputStack.push_back({number, Token::Type::Number});
         }
         else if (c == ' ')
         {
