@@ -31,7 +31,8 @@ struct Token
         Unknown,
         Number,
         Operator,
-        // Parenthesis,
+        Parenthesis_Open,
+        Parenthesis_Close,
         // End
     } type = Type::Unknown;
     sOperator op;
@@ -53,11 +54,35 @@ int main()
             // Push literal numerics right into the output stack
             outputStack.push_back({std::string(1, c), Token::Type::Number});
         }
+        else if(c == '(')
+        {
+            // pus- h to holdingStack
+            holdingStack.push_front({std::string(1, c), Token::Type::Parenthesis_Open});
+        }
+        else if(c == ')')
+        {
+            while(!holdingStack.empty() && holdingStack.front().type != Token::Type::Parenthesis_Open)
+            {
+                outputStack.push_back(holdingStack.front());
+                holdingStack.pop_front();
+            }
+
+            if(holdingStack.empty())
+            {
+                std::cerr << "Error! Unexpected parenthesis..." << std::endl;
+                return 0;
+            }
+            // remove corresponding open parenthesis from holdingStack
+            if(!holdingStack.empty() && holdingStack.front().type == Token::Type::Parenthesis_Open)
+            {
+                holdingStack.pop_front();
+            }
+        }
         else if(mapOperator.contains(c))
         {
             const auto& newOp = mapOperator[c];
 
-            while(!holdingStack.empty())
+            while(!holdingStack.empty() && holdingStack.front().type != Token::Type::Parenthesis_Open)
             {
                 // ensure stack front is an operator
                 
